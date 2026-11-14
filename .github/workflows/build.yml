@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,3 +41,14 @@ jobs:
           name: nfc-tags-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk NFCTags.apk
+
+      - name: Publish release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: NFC Tags (build ${{ github.run_number }})
+          make_latest: true
+          files: NFCTags.apk
